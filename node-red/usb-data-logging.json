@@ -1,0 +1,542 @@
+[
+    {
+        "id": "ae6d3bf74ed4feaf",
+        "type": "tab",
+        "label": "Save Sensor Data - USB",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "99d673dc0bb2d8aa",
+        "type": "group",
+        "z": "ae6d3bf74ed4feaf",
+        "name": "This flow receives and formats sensor data and saves it into CSV files",
+        "style": {
+            "label": true,
+            "stroke": "none",
+            "fill": "#ffefbf",
+            "fill-opacity": "0.52"
+        },
+        "nodes": [
+            "2006100fb098e59f",
+            "826dbdfed4e6dd30",
+            "dcdb633910b4489d",
+            "f15036bc00ac9afc",
+            "ee9788a4596e1a82",
+            "def1f051c455812e",
+            "8145d2df50c2d562",
+            "7f92878466352a2f"
+        ],
+        "x": 614,
+        "y": 459,
+        "w": 1312,
+        "h": 82
+    },
+    {
+        "id": "a6e98ac4e302bede",
+        "type": "group",
+        "z": "ae6d3bf74ed4feaf",
+        "name": "",
+        "style": {
+            "stroke": "none",
+            "fill": "#ffefbf",
+            "fill-opacity": "0.49",
+            "label": true
+        },
+        "nodes": [
+            "3e03cefc66b63ba0",
+            "fd5e01450536f2cd",
+            "78096eea3a54739a",
+            "c5a824705b2b54ef",
+            "4191a3470092aca1",
+            "5c209ae04c5c1bb1",
+            "919e099170a90e7f",
+            "ca05fbc3e9b772f0"
+        ],
+        "x": 614,
+        "y": 59,
+        "w": 812,
+        "h": 282
+    },
+    {
+        "id": "f72d3f7317e1878a",
+        "type": "debug",
+        "z": "ae6d3bf74ed4feaf",
+        "name": "All messages",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 410,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "7f92878466352a2f",
+        "type": "switch",
+        "z": "ae6d3bf74ed4feaf",
+        "g": "99d673dc0bb2d8aa",
+        "name": "filter-by-sensor-data",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "sensor_data",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 740,
+        "y": 500,
+        "wires": [
+            [
+                "8145d2df50c2d562"
+            ]
+        ]
+    },
+    {
+        "id": "36df571e9b3fa8ed",
+        "type": "ncd-gateway-node",
+        "z": "ae6d3bf74ed4feaf",
+        "name": "",
+        "connection": "",
+        "unknown_devices": 0,
+        "outputs": 1,
+        "x": 190,
+        "y": 500,
+        "wires": [
+            [
+                "f72d3f7317e1878a",
+                "40beead2bb5d5b1f"
+            ]
+        ]
+    },
+    {
+        "id": "ebb6f04fad4070a7",
+        "type": "comment",
+        "z": "ae6d3bf74ed4feaf",
+        "name": "Step 1 - 👇Set your /dev/ttymxc2 port here",
+        "info": "",
+        "x": 180,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "8145d2df50c2d562",
+        "type": "change",
+        "z": "ae6d3bf74ed4feaf",
+        "g": "99d673dc0bb2d8aa",
+        "name": "replace-addr-colon",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.addr",
+                "pt": "msg",
+                "to": "$replace(payload.addr, \":\", \"-\")",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 950,
+        "y": 500,
+        "wires": [
+            [
+                "f15036bc00ac9afc"
+            ]
+        ]
+    },
+    {
+        "id": "2006100fb098e59f",
+        "type": "file",
+        "z": "ae6d3bf74ed4feaf",
+        "g": "99d673dc0bb2d8aa",
+        "name": "write",
+        "filename": "filename",
+        "filenameType": "msg",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 1530,
+        "y": 500,
+        "wires": [
+            [
+                "def1f051c455812e"
+            ]
+        ]
+    },
+    {
+        "id": "826dbdfed4e6dd30",
+        "type": "debug",
+        "z": "ae6d3bf74ed4feaf",
+        "g": "99d673dc0bb2d8aa",
+        "name": "saving data",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1810,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "dcdb633910b4489d",
+        "type": "function",
+        "z": "ae6d3bf74ed4feaf",
+        "g": "99d673dc0bb2d8aa",
+        "name": "format",
+        "func": "// Extract the sensor_data (payload) from the incoming message\nconst payload = msg.payload;\n\n// Define the common fields that will be in every CSV file\n// NCD Sensors Meta data\nconst commonData = {\n    time: msg.time, \n    firmware: payload.firmware,\n    count: payload.counter,\n    battery: payload.battery_percent,\n    rssi: payload.rssi || '-' // if RSSI is not enabled\n};\n\n// Get the sensor data\nconst sensorData = payload.sensor_data;\nconst addr = msg.addr;\n\n// Combine the Meta data and the sensor data into a single, flat object.\n// The order of columns will be: commonData keys, then sensorData keys.\nconst flatData = { ...commonData, ...sensorData };\n\n// The header is the list of keys from our flat data object\nconst headers = Object.keys(flatData);\n// The data row is the list of values.\nconst values = Object.values(flatData);\n\n// Convert arrays into comma-separated strings\nconst headerString = headers.join(',');\nconst rowString = values.join(',');\n\n\n// Handle writing the header only once per file\n// -----------------------------------------------\n// We use flow context to remember if we've already written the header for a specific sensor type.\nconst contextKey = `header_written_${addr}`;\nconst headerWritten = flow.get(contextKey) || false;\n\nlet csvPayload = \"\";\n\nif (!headerWritten) {\n    // If the header hasn't been written yet, combine the header and the first row.\n    // The '\\n' creates a new line between the header and the data.\n    csvPayload = headerString + '\\n' + rowString;\n    // Save the state to the flow context so we don't write the header again.\n    flow.set(contextKey, true);\n} else {\n    // If the header has already been written, the payload is just the new data row.\n    csvPayload = rowString;\n}\n\n// 4. Prepare the message for the 'file' node\n// --------------------------------------------\n// The 'file' node uses msg.payload as the content\nmsg.payload = csvPayload;\n\n// Pass the message to the next node in the flow (the 'file' node)\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1410,
+        "y": 500,
+        "wires": [
+            [
+                "2006100fb098e59f"
+            ]
+        ]
+    },
+    {
+        "id": "f15036bc00ac9afc",
+        "type": "change",
+        "z": "ae6d3bf74ed4feaf",
+        "g": "99d673dc0bb2d8aa",
+        "name": "build-payload",
+        "rules": [
+            {
+                "t": "set",
+                "p": "addr",
+                "pt": "msg",
+                "to": "payload.addr",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "addr",
+                "pt": "msg",
+                "to": "$substring(addr,12)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "date",
+                "pt": "msg",
+                "to": "$moment(data.received).format(\"YYYY-MM-DD\")",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "time",
+                "pt": "msg",
+                "to": "$moment(data.received).format(\"HH:mm:ss\")",
+                "tot": "jsonata"
+            },
+            {
+                "t": "delete",
+                "p": "payload.original",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1130,
+        "y": 500,
+        "wires": [
+            [
+                "ee9788a4596e1a82"
+            ]
+        ]
+    },
+    {
+        "id": "ee9788a4596e1a82",
+        "type": "function",
+        "z": "ae6d3bf74ed4feaf",
+        "g": "99d673dc0bb2d8aa",
+        "name": "build-path",
+        "func": "/**\n * \n * Creates a dynamic file path using the \n * base path (usb drive) \n * as well as current date and sensor address.\n * \n */\n\nvar userpath = flow.get('usb_path');\nvar address = msg.addr;\nvar date = msg.date;\n\nmsg.filename = userpath + \"/\" + address + \"/\" + date + \"/\" + date + \"_\" + address +'.csv';\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1280,
+        "y": 500,
+        "wires": [
+            [
+                "dcdb633910b4489d"
+            ]
+        ]
+    },
+    {
+        "id": "def1f051c455812e",
+        "type": "function",
+        "z": "ae6d3bf74ed4feaf",
+        "g": "99d673dc0bb2d8aa",
+        "name": "validator",
+        "func": "/**\n * \n * Validates the write operation to \n * ensure data is correctly saved\n * \n */\n\nlet payload = msg.payload;\n\nif(typeof payload === \"string\" ){\n    msg.payload = \"Saving data to a USB drive...\";\n    return msg;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1660,
+        "y": 500,
+        "wires": [
+            [
+                "826dbdfed4e6dd30"
+            ]
+        ]
+    },
+    {
+        "id": "3e03cefc66b63ba0",
+        "type": "inject",
+        "z": "ae6d3bf74ed4feaf",
+        "g": "a6e98ac4e302bede",
+        "name": "Enable",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 750,
+        "y": 180,
+        "wires": [
+            [
+                "fd5e01450536f2cd"
+            ]
+        ]
+    },
+    {
+        "id": "fd5e01450536f2cd",
+        "type": "exec",
+        "z": "ae6d3bf74ed4feaf",
+        "g": "a6e98ac4e302bede",
+        "command": "lsblk -o MOUNTPOINT | grep '/media/' | awk -F'/media/' '{print $2}'",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "usb cmd",
+        "x": 900,
+        "y": 200,
+        "wires": [
+            [
+                "c5a824705b2b54ef"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "78096eea3a54739a",
+        "type": "debug",
+        "z": "ae6d3bf74ed4feaf",
+        "g": "a6e98ac4e302bede",
+        "name": "usb drive",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1320,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "c5a824705b2b54ef",
+        "type": "function",
+        "z": "ae6d3bf74ed4feaf",
+        "g": "a6e98ac4e302bede",
+        "name": "evaluate-&-create-new-usb-path",
+        "func": "/**\n * \n * Checks for a connected USB drive \n * and creates the new path on the drive.\n * \n */\n\n\nlet payload = msg.payload.slice(0, -1);\nif(payload == \"\"){\n    msg.payload = \"No USB drive detected/connected.\"\n    return msg;\n}\n\nlet usb_name = payload;\nlet usb_path = \"/media/\" + usb_name + \"/ncd_log\";\nflow.set('usb_path', usb_path)\nmsg.payload = \"USB drive found: \" + payload + \" - Path Created Successfully.\";\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1110,
+        "y": 200,
+        "wires": [
+            [
+                "78096eea3a54739a"
+            ]
+        ]
+    },
+    {
+        "id": "4191a3470092aca1",
+        "type": "comment",
+        "z": "ae6d3bf74ed4feaf",
+        "g": "a6e98ac4e302bede",
+        "name": "Step 4 - 👇Enable this flow to create a USB path if a drive is connected to the Gateway's USB port",
+        "info": "",
+        "x": 970,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "5c209ae04c5c1bb1",
+        "type": "comment",
+        "z": "ae6d3bf74ed4feaf",
+        "g": "a6e98ac4e302bede",
+        "name": "Step 3 - Before enabling this flow, connect a FAT32-formatted USB drive to the Gateway's USB port",
+        "info": "",
+        "x": 980,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "fd053aa373dbcf01",
+        "type": "comment",
+        "z": "ae6d3bf74ed4feaf",
+        "name": "Step 2 - Click on the Deploy button ",
+        "info": "",
+        "x": 200,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "919e099170a90e7f",
+        "type": "comment",
+        "z": "ae6d3bf74ed4feaf",
+        "g": "a6e98ac4e302bede",
+        "name": "Step 5 - It will displays an error here if no USB drive is detected.",
+        "info": "",
+        "x": 1070,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "ca05fbc3e9b772f0",
+        "type": "comment",
+        "z": "ae6d3bf74ed4feaf",
+        "g": "a6e98ac4e302bede",
+        "name": "If successful, the path is created and the result is logged to the debug window 👉",
+        "info": "",
+        "x": 1120,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "ecbaef041c619388",
+        "type": "comment",
+        "z": "ae6d3bf74ed4feaf",
+        "name": "Step 6 - ☝️ Enable to pass sensor data through the 'message-control' node. ",
+        "info": "",
+        "x": 380,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "616e2f8dea3ef07e",
+        "type": "inject",
+        "z": "ae6d3bf74ed4feaf",
+        "name": "Enable",
+        "props": [
+            {
+                "p": "control",
+                "v": "true",
+                "vt": "bool"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 290,
+        "y": 600,
+        "wires": [
+            [
+                "40beead2bb5d5b1f"
+            ]
+        ]
+    },
+    {
+        "id": "b736cd84b993b03a",
+        "type": "inject",
+        "z": "ae6d3bf74ed4feaf",
+        "name": "Disable",
+        "props": [
+            {
+                "p": "control",
+                "v": "false",
+                "vt": "bool"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 290,
+        "y": 640,
+        "wires": [
+            [
+                "40beead2bb5d5b1f"
+            ]
+        ]
+    },
+    {
+        "id": "40beead2bb5d5b1f",
+        "type": "function",
+        "z": "ae6d3bf74ed4feaf",
+        "name": "message-control",
+        "func": "// Retrieve the current control state, defaulting to 'false' (disabled) if not set.\nlet currentState = flow.get('flow_enabled') || false;\n\n// Check if a control message was received and if it's a valid boolean.\nif (typeof msg.control === 'boolean') {\n    // A control signal was received. Check if it's different from the current state.\n    if (currentState !== msg.control) {\n        // State has changed, update the flow context.\n        currentState = msg.control;\n        flow.set('flow_enabled', currentState);\n    }\n    msg.payload = currentState ? \"Enabled\" : \"Disabled\";\n    msg.color = currentState ? \"green\" : \"red\";\n    node.status({fill:msg.color,shape:\"ring\",text:msg.payload});\n}\n\n// Main Logic: Pass the message only if the flow is enabled (currentState is true).\nif (currentState === true) {\n    return msg;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 500,
+        "wires": [
+            [
+                "7f92878466352a2f"
+            ]
+        ],
+        "icon": "font-awesome/fa-caret-right"
+    },
+    {
+        "id": "b0e13194fc6b6b8e",
+        "type": "comment",
+        "z": "ae6d3bf74ed4feaf",
+        "name": "With these nodes you can controls (enable/disable) whether messages pass through the 'message-control' node.",
+        "info": "",
+        "x": 500,
+        "y": 720,
+        "wires": []
+    }
+]
